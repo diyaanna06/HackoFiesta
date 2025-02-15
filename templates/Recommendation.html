@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Fertilizer Recommendation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://media.istockphoto.com/id/1465642013/photo/a-vibrant-green-soybean-field-nestled-in-a-natural-setting.jpg?s=612x612&w=0&k=20&c=ukaUysAFOmCHYpOkVHZi-dYjKXNMh-QnIq40KEG3NuQ=') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 22px;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        label {
+            font-weight: bold;
+            font-size: 18px;
+            flex: 1;
+        }
+        input, select {
+            flex: 2;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px;
+        }
+        button {
+            width: 100%;
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Fertilizer Recommendation</h2>
+        <form id="fertilizerForm">
+            <div class="form-group">
+                <label>Temperature:</label>
+                <input type="number" id="temperature" required>
+            </div>
+            <div class="form-group">
+                <label>Humidity:</label>
+                <input type="number" id="humidity" required>
+            </div>
+            <div class="form-group">
+                <label>Moisture:</label>
+                <input type="number" id="moisture" required>
+            </div>
+            <div class="form-group">
+                <label>Soil Type:</label>
+                <select id="soil">
+                    <option>Black</option>
+                    <option>Clayey</option>
+                    <option>Loamy</option>
+                    <option>Red</option>
+                    <option>Sandy</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Crop Type:</label>
+                <select id="crop">
+                    <option>Barley</option>
+                    <option>Cotton</option>
+                    <option>Ground Nuts</option>
+                    <option>Maize</option>
+                    <option>Millets</option>
+                    <option>Oil Seeds</option>
+                    <option>Paddy</option>
+                    <option>Pulses</option>
+                    <option>Sugarcane</option>
+                    <option>Tobacco</option>
+                    <option>Wheat</option>
+                    <option>coffee</option>
+                    <option>kidneybeans</option>
+                    <option>orange</option>
+                    <option>pomegranate</option>
+                    <option>rice</option>
+                    <option>watermelon</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nitrogen:</label>
+                <input type="number" id="nitrogen" required>
+            </div>
+            <div class="form-group">
+                <label>Potassium:</label>
+                <input type="number" id="potassium" required>
+            </div>
+            <div class="form-group">
+                <label>Phosphorus:</label>
+                <input type="number" id="phosphorus" required>
+                
+            </div>
+         
+            <button type="submit" name="submit" class="btn">Get Recommendation</button>
+        </form>
+
+        <div class="result" id="result"></div>
+    </div>
+    <script>
+        document.getElementById("fertilizerForm").addEventListener("submit", function(event) {
+            event.preventDefault(); 
+    
+            let requestData = {
+                "temperature": parseFloat(document.getElementById("temperature").value),
+                "humidity": parseFloat(document.getElementById("humidity").value),
+                "moisture": parseFloat(document.getElementById("moisture").value),
+                "soil": document.getElementById("soil").value,
+                "crop": document.getElementById("crop").value,
+                "nitrogen": parseFloat(document.getElementById("nitrogen").value),
+                "potassium": parseFloat(document.getElementById("potassium").value),
+                "phosphorus": parseFloat(document.getElementById("phosphorus").value),
+    };
+    
+            fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())  
+            .then(data => {
+                console.log("Received:", data);
+                if (data.fertilizer) {
+                    document.getElementById("result").innerText = "Recommended Fertilizer: " + data.fertilizer;
+                } else {
+                    document.getElementById("result").innerText = "Error: " + (data.error || "Unexpected response");
+
+                }
+            })
+            .catch(error => console.error("Fetch Error:", error));
+        });
+    </script>  
+</body>
+</html>

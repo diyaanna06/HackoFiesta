@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>AI Chatbot</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            background-color: #fefefd;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            max-width: 600px;
+            height: 100vh;
+            margin: 0 auto;
+          
+            border: 1px solid #ecfcd9;
+            border-radius: 10px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        .message {
+            display: flex;
+            margin: 10px 0;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background-color: #409747;
+            color:  #ecfcd9;
+        }
+
+        .message.bot .message-content {
+            background-color:  #ecfcd9;
+            color: #333;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color:  #ecfcd9;
+            border-top: 1px solid  #ecfcd9;
+        }
+
+        #query {
+            flex-grow: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid  #ecfcd9;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #query:focus {
+            border-color: #409747;
+        }
+
+        #send-btn {
+            background-color: #409747;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin-left: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        @media (max-width: 768px) {
+            .chat-container {
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            #query {
+                font-size: 14px;
+            }
+
+            #send-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #query {
+                font-size: 12px;
+            }
+
+            #send-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+        .footer {
+            padding: 10px;
+            text-align: center;
+            background-color: #fafafa;
+            border-top: 1px solid #ddd;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .footer a {
+            margin: 0 10px;
+            color: #409747;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-box" class="chat-box">
+            <div class="message bot">
+                <div class="message-content">
+                   Hello! I am your agricultural assistant. How can I assist you with farming today?
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input id="query" type="text" autocomplete="off">
+            <button id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+
+        <div class="footer" style="color: black;">
+            <p style="color: black;">Powered by Gemini</p>
+        </div>        
+    </div>
+<script>
+      document.addEventListener("DOMContentLoaded", function () {
+    loadChatHistory();
+    document.getElementById("query").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            sendMessage();
+        }
+    });
+    document.getElementById("send-button").addEventListener("click", sendMessage);
+});
+
+function loadChatHistory() {
+    const history = JSON.parse(localStorage.getItem("chatHistory")) || [];
+    history.forEach(item => appendMessage(item.message, item.sender));
+}
+
+function saveChatHistory() {
+    const messages = document.querySelectorAll(".message");
+    const history = Array.from(messages).map(message => ({
+        message: message.querySelector(".message-content").innerHTML,
+        sender: message.classList.contains("user") ? "user" : "bot",
+    }));
+    localStorage.setItem("chatHistory", JSON.stringify(history));
+}
+function sendMessage() {
+    const queryInput = document.getElementById("query");
+    const query = queryInput.value.trim();
+
+    if (!query) return; 
+    appendMessage(query, "user");
+    queryInput.value = ""; 
+
+    fetch("/chatbot/api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: query })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.response) {
+                appendMessage(formatResponse(data.response), "bot");
+            } else {
+                appendMessage("Oops! No response from the server.", "bot");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            appendMessage("Oops! Something went wrong.", "bot");
+        })
+        .finally(() => saveChatHistory()); 
+}
+
+function appendMessage(message, sender) {
+    const chatBox = document.getElementById("chat-box");
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message", sender);
+
+    const contentDiv = document.createElement("div");
+    contentDiv.classList.add("message-content");
+    contentDiv.innerHTML = sender === "bot" ? message : escapeHTML(message); 
+    messageDiv.appendChild(contentDiv);
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight; 
+    saveChatHistory();
+}
+function formatResponse(response) {
+    return response
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") 
+        .replace(/\*(.*?)\*/g, "<em>$1</em>") 
+        .replace(/\n/g, "<br>"); 
+}
+function escapeHTML(str) {
+    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+</script>
+</body>
+</html>

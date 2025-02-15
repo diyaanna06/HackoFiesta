@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Based Solution for Farmers</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ecfcd9;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+    background-color:  #409747;
+    color: white;
+    padding: 20px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-btn {
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-grow: 1; 
+    justify-content: center; 
+    gap: 80px; }
+
+.nav-item {
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.nav-item:hover {
+    color: #a3d5b4;
+}
+
+    .carousel {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .carousel img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      display: none;
+      height: 500px;
+    }
+    .carousel img.active {
+      display: block;
+    }
+    .slideshow {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        .slideshow img {
+            position: absolute;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            opacity: 0;
+            animation: slide 1s infinite;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .slideshow img.active {
+            opacity: 1;
+        }
+
+        .slideshow .controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .slideshow .controls button {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            pointer-events: all;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card1 {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 250px;
+      height: 100px;
+      gap: 40px;
+      
+    }
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #409747;
+      color: white;
+      padding: 20px;
+      position: fixed;
+      left: -300px;
+      height: 100%;
+      transition: left 0.3s;
+      z-index: 2;
+    }
+    .sidebar.show {
+      left: 0;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar-item {
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .sidebar-item:hover {
+      background-color: #1b4332;
+    }
+    .carousel {
+      position: relative;
+      z-index: 1;
+    }
+
+
+    header {
+      background: url('https://via.placeholder.com/1200x400') no-repeat center center/cover;
+      text-align: center;
+      padding: 10px 20px;
+    }
+
+    header h1 {
+      font-size: 3em;
+      margin-bottom: 5px;
+    }
+    h3 {padding: 0.5px 0; }
+
+    header p {
+      font-size: 1.5em;
+      margin: 10px 0 20px;
+    }
+
+    .button {
+      background-color:  #409747;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #15803d;
+    }
+
+    .features, .testimonials, .faq, .contact {
+      padding: 20px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .testimonial, .faq-item {
+      background-color: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      text-align: center;
+      padding: 5px;   
+      background-color: #e5e7eb;
+      color: #374151;
+      font-size: 0.9em;
+    }
+
+    form {
+      display: flex;
+      
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input, textarea {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .title{
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div style="position: fixed; bottom: 0; right: 0; margin: 10px;z-index: 10000;">
+    <img src="https://cdn4.iconfinder.com/data/icons/dot/256/arrow_up_1.png"
+         alt="Back to Top" height="60cm" width="60cm" class="back-to-top" onclick="scrollToTop()">
+  </div>
+  <nav class="navbar">
+    <ul>
+      <li class="nav-item">Home</li>
+      <li class="nav-item">Agriculture</li>
+      <li class="nav-item">Advanced Effects</li>
+      <li class="nav-item">About Us</li>
+      <li class="nav-item">Contact</li>
+    </ul>
+  </nav>
+  <div class="carousel">
+    <div class="slideshow" id="slideshow" style="width:device-width">
+      <img src="https://www.syngenta.com/sites/default/files/styles/f_p_s_c_1920x728/public/2024-11/Print_Agriculture%20field%20at%20sunset%2C%20green%20wheat%20and%20soil.jpg.webp?itok=22PmQQc0">
+      <img src="https://back.3blcdn.com/sites/default/files/styles/ratio_3_2/public/triplepundit/wide/Regen%20Wheat%20Field_0.jpg?h=a1a70de6" >
+      <img src="https://plasticseurope.org/wp-content/uploads/2021/10/5.6._aaheader.png" >
+      <div class="controls">
+          <button id="prev"><</button>
+          <button id="next">></button>
+      </div>
+  </div>
+</div>
+
+<main class="content">
+    <header>
+      <h1 >AI-Based Solution for Farmers</h1>
+      <p>Welcome to AgroTech Solutions</p>
+    </header>
+    <section class="card-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; text-align: center;">
+      <div style="display: flex; justify-content: center; width: 100%; flex-wrap: wrap;">
+      <div class="card" style="width: 30%; height: 360px; display: flex; flex-direction: column; align-items: center; text-align: center; margin: 10px;">
+          <img src="https://img.freepik.com/free-photo/sunny-meadow-landscape_1112-134.jpg" alt="Crop Prediction Model" style="width: 100%; height: 180px; object-fit: cover; border-radius: 10px;">
+          <h3>Fertilizer Recommendation</h3>
+          <p>Our AI-powered model suggests the most effective fertilizers based on real-time soil conditions, crop type, and weather patterns, ensuring healthier plant growth and improved yields.</p>
+          <div class="model-button-container">
+              <a href="Recommendation.html">
+                <button class="button">Try Fertilizer Recommendation</button>
+              </a>
+          </div>
+      </div>
+        <div class="card" style="width: 30%; height: 360px; display: flex; flex-direction: column; align-items: center; text-align: center; margin: 10px;">
+          <img src="https://media.istockphoto.com/id/1445426863/vector/chat-bot-vector-logo-design-concept.jpg?s=612x612&w=0&k=20&c=XDdfzS4lNW9yxQ0BQGZq9KMLL4bJ8ywXlYdAhBSuoCA=" alt="Chatbot" style="width: 100%; height: 180px; object-fit: cover; border-radius: 10px;">
+          <h3>AI Chatbot</h3>
+          <p>Our smart chatbot provides instant answers to farmers' queries, covering best farming practices, pest control, weather forecasts, and market prices.</p>
+          <div class="chatbot-button-container">
+            <a href="http://127.0.0.1:5000/chatbot">
+              <button  class="button" onclick="window.location.href='/chatbot'">Talk to AI Chatbot</button>
+          </a>
+          </div>
+        </div>    
+      </div>
+    </section>
+  </main>
+  <section id="contact" class="contact">
+    <h2>Contact Us</h2>
+    <form onsubmit="submitForm(event)">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea placeholder="Your Message" required></textarea>
+      <button class="button" type="submit">Send Message</button>
+    </form>
+  </section>
+  <footer>
+    <p>&copy; 2025 Department of Agriculture - AI for Farmers</p>
+  </footer>
+
+  <script>
+       let currentIndex = 0;
+    const images = document.querySelectorAll(".carousel img");
+    function changeImage() {
+      images[currentIndex].classList.remove("active");
+      currentIndex = (currentIndex + 1) % images.length;
+      images[currentIndex].classList.add("active");
+    }
+    setInterval(changeImage, 1000); 
+            let slideIndex = 0;
+            let slides = document.querySelectorAll(".slideshow img");
+            let interval;
+    
+            function showSlides(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove("active");
+                    if (i === index) {
+                        slide.classList.add("active");
+                    }
+                });
+            }
+            function nextSlide() {
+                slideIndex = (slideIndex + 1) % slides.length;
+                showSlides(slideIndex);
+            }
+    
+            function prevSlide() {
+                slideIndex = (slideIndex - 1 + slides.length) % slides.length;
+                showSlides(slideIndex);
+            }
+    
+            function startSlideshow() {
+                interval = setInterval(nextSlide, 3000);
+            }
+    
+            function stopSlideshow() {
+                clearInterval(interval);
+            }
+    
+            document.getElementById("next").addEventListener("click", () => {
+                stopSlideshow();
+                nextSlide();
+            });
+    
+            document.getElementById("prev").addEventListener("click", () => {
+                stopSlideshow();
+                prevSlide();
+            });
+    
+            const slideshowElement = document.getElementById("slideshow");
+            slideshowElement.addEventListener("mouseover", stopSlideshow);
+            slideshowElement.addEventListener("mouseout", () => {
+                startSlideshow();
+            });
+
+            startSlideshow();
+    
+            function scrollToTop() {
+                window.scrollTo({
+                    top: 0, 
+                    behavior:"smooth"
+                });
+            }
+  </script>
+</body>
+</html>
