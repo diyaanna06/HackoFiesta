@@ -35,7 +35,7 @@ def chatbot_api():
         return jsonify({"error": str(e)}), 500
 def get_gemini_response(user_message):
     try:
-        model = genai.GenerativeModel("gemini-pro") 
+        model = genai.GenerativeModel("gemini-2.0-flash") 
         response = model.generate_content(user_message)
         if hasattr(response, "text"):
             return response.text 
